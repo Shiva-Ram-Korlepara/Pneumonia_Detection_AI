@@ -1,3 +1,9 @@
+from gevent import monkey
+monkey.patch_all()
+
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 from flask import Flask, request, jsonify, render_template, send_from_directory
 import tensorflow as tf
 import numpy as np
@@ -63,4 +69,4 @@ def predict():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
