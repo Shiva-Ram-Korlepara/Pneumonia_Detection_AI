@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pneumonia Detection</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-900">
+
+    <!-- Header Section -->
+    <header class="w-full bg-gray-800 text-white py-4">
+        <div class="max-w-4xl mx-auto flex justify-between items-center px-6">
+            <h1 class="text-3xl font-bold text-center md:text-left w-full md:w-fit">Pneumonia Detection</h1>
+            <nav>
+                <ul class="hidden md:flex space-x-6">
+                    <li><a href="#how-it-works" class="hover:text-blue-300">How It Works</a></li>
+                    <li><a href="#model-info" class="hover:text-blue-300">Model Info</a></li>
+                    <li><a href="#why-use" class="hover:text-blue-300">Why Use This Model</a></li>
+                    <li><a href="#contact" class="hover:text-blue-300">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <div class="w-full max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+        <p class="text-center text-gray-600 mt-2">A fast and reliable way to detect pneumonia using deep learning.</p>
+
+        <!-- Text Box -->
+        <div class="text-xl font-semibold text-gray-700 mt-6">Add an image in the box to predict the X-Ray</div>
+
+    <!-- Upload Box (Centered) -->
+    <form action="{{url_for('predict')}}" method="post" enctype="multipart/form-data" class="mt-6 flex flex-col items-center">
+        <div class="relative w-80 h-80 border-2 border-dashed border-gray-400 flex justify-center items-center flex-col rounded-lg hover:bg-gray-50 cursor-pointer mx-auto" id="uploadBox">
+            <span class="text-gray-500" id="browseText">Browse</span>
+            <input type="file" id="imageInput" name="file" accept="image/*" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+            <img id="preview" src="" class="hidden mt-4 rounded-lg object-contain w-full h-full">
+        </div>
+
+        <!-- Prediction Result -->
+        <div id="predictionResult" class="mt-6 hidden p-4 bg-blue-100 text-blue-700 font-semibold rounded-lg shadow-md">
+            Prediction Result: --
+        </div>
+    </form>
+
+
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="w-full max-w-4xl mx-auto p-6 bg-gray-50 shadow-lg rounded-lg mt-10" id="how-it-works">
+        <h2 class="text-2xl font-semibold text-gray-800">How It Works</h2>
+        <p class="text-gray-600 mt-4">Our pneumonia detection model follows a simple three-step process:</p>
+        <ul class="list-none pl-5 mt-4 space-y-2 text-gray-600">
+            <li>✔ Upload an X-ray image of the chest</li>
+            <li>✔ The deep learning model processes the image</li>
+            <li>✔ Get instant results on whether pneumonia is detected</li>
+        </ul>
+    </div>
+
+    <!-- Model Information Section -->
+    <div class="w-full max-w-4xl mx-auto p-6 bg-gray-50 shadow-lg rounded-lg mt-10" id="model-info">
+        <h2 class="text-2xl font-semibold text-gray-800">Model Information</h2>
+        <p class="text-gray-600 mt-4">Our model is trained using a convolutional neural network (CNN) on a dataset of chest X-rays.</p>
+        <p class="text-gray-600 mt-2"><strong>Dataset:</strong> NIH Chest X-ray Dataset</p>
+        <p class="text-gray-600 mt-2"><strong>Accuracy:</strong> 92.3%</p>
+        <p class="text-gray-600 mt-2"><strong>Method:</strong> Transfer Learning with EfficientNet</p>
+    </div>
+
+    <!-- Why This Model Section -->
+    <div class="w-full max-w-4xl mx-auto p-6 bg-gray-50 shadow-lg rounded-lg mt-10" id="why-use">
+        <h2 class="text-2xl font-semibold text-gray-800">Why Use This Model?</h2>
+        <p class="text-gray-600 mt-4">✔ High accuracy with deep learning-based image analysis</p>
+        <p class="text-gray-600 mt-2">✔ Faster results than traditional diagnosis</p>
+        <p class="text-gray-600 mt-2">✔ Can assist radiologists in making better decisions</p>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="w-full bg-gray-800 text-white text-center py-6 mt-10" id="contact">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="text-2xl font-semibold">Contact Us</h2>
+            <p class="text-gray-300 mt-4">For any queries or feedback, please reach out:</p>
+            <p class="text-gray-300 mt-2">Email: <strong>support@pneumoniadetect.com</strong></p>
+        </div>
+        <div class="mt-6">
+            © 2025 Pneumonia Detection | Powered by AI & Deep Learning
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imgElement = document.getElementById('preview');
+                    imgElement.src = e.target.result;
+                    imgElement.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+
+                // Create FormData and send to Flask API
+                const formData = new FormData();
+                formData.append("file", file);
+
+                fetch('/predict', {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.prediction) {
+                        const predictionArray = data.prediction[0]; // Extract the first prediction array
+                        const noPneumonia = predictionArray[0]; // Probability of No Pneumonia
+                        const pneumonia = predictionArray[1];   // Probability of Pneumonia
+                        
+                        let resultText;
+                        if (pneumonia > noPneumonia) {
+                            resultText = `Prediction: Pneumonia Detected ✅ (${(pneumonia * 100).toFixed(2)}%)`;
+                        } else {
+                            resultText = `Prediction: No Pneumonia ❌ (${(noPneumonia * 100).toFixed(2)}%)`;
+                        }
+
+                        const resultElement = document.getElementById('predictionResult');
+                        resultElement.classList.remove('hidden');
+                        resultElement.innerText = resultText;
+                    } else {
+                        console.error("Unexpected response:", data);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    </script>
+
+</body>
+</html>
