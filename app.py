@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import tensorflow as tf
 import numpy as np
 import cv2
@@ -18,6 +18,10 @@ def preprocess_image(image_data):
     image_array = np.expand_dims(image_array, axis=(0, -1))  # Reshape to (1, 480, 480, 1)
 
     return image_array
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('static', 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route("/")
 def home():
