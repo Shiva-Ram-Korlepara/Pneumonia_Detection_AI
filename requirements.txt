@@ -3,3 +3,4 @@ numpy
 opencv_python==4.11.0.86
 Pillow==11.1.0
 tensorflow==2.18.0
+gunicorn
