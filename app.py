@@ -39,7 +39,7 @@ def predict():
             return jsonify({"error": "No file uploaded"}), 400
 
         print(f"✅ File Received: {file.filename}, Type: {file.content_type}")
-        file = request.files["file"]
+        file = request.files.get("file")
         image_data = file.read()
         print(f"📏 Image Size: {len(image_data)} bytes")
 

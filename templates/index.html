@@ -109,13 +109,19 @@
                     method: "POST",
                     body: formData
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.text().then(err => { throw new Error(err) });
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log("🔮 Server Response:", data);
                     if (data.prediction) {
-                        const predictionArray = data.prediction[0]; // Extract the first prediction array
-                        const noPneumonia = predictionArray[0]; // Probability of No Pneumonia
-                        const pneumonia = predictionArray[1];   // Probability of Pneumonia
-                        
+                        const predictionArray = data.prediction[0]; 
+                        const noPneumonia = predictionArray[0]; 
+                        const pneumonia = predictionArray[1];   
+
                         let resultText;
                         if (pneumonia > noPneumonia) {
                             resultText = `Prediction: Pneumonia Detected ✅ (${(pneumonia * 100).toFixed(2)}%)`;
@@ -130,7 +136,10 @@
                         console.error("Unexpected response:", data);
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('🚨 Error Fetching Prediction:', error);
+                    alert("Server Error! Check console for details.");
+                });
             }
         });
     </script>
