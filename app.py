@@ -32,11 +32,16 @@ def home():
 def predict():
     """Handle image upload and return CNN model prediction."""
     try:
+        print("📢 Received request at /predict") 
+
         if "file" not in request.files:
+            print("⚠️ No file received!")
             return jsonify({"error": "No file uploaded"}), 400
 
+        print(f"✅ File Received: {file.filename}, Type: {file.content_type}")
         file = request.files["file"]
         image_data = file.read()
+        print(f"📏 Image Size: {len(image_data)} bytes")
 
         # Debugging step: Print file size
         print(f"Received image size: {len(image_data)} bytes")
@@ -51,6 +56,7 @@ def predict():
         # Debugging step: Print model output
         print(f"Model Prediction: {prediction}")
 
+        print(f"🔮 Prediction Output: {prediction.tolist()}")
         return jsonify({"prediction": prediction.tolist()})
 
     except Exception as e:
